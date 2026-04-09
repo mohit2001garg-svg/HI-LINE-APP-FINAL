@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { db, checkPermission } from '../services/db';
+import { db, checkPermission } from '@/services/db';
 import { Block, BlockStatus, MachineId, PowerCut, StaffMember } from '../types';
 import ExcelJS from 'exceljs';
 

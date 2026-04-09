@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useRef } from 'react';
-import { db } from '../services/db';
+import { db } from '@/services/db';
 import { Block, BlockStatus, StockyardLocation, StaffMember } from '../types';
 import { exportToExcel } from '../services/utils';
 import ExcelJS from 'exceljs';

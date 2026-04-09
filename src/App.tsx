@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { db, supabase } from './services/db';
+import { db, supabase } from '@/services/db';
 import { Block, StaffMember, View, Branding, BlockStatus } from './types';
 import { BlockArrival } from './components/BlockArrival';
 import { GantryQueue } from './components/GantryQueue';
