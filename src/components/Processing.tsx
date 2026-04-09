@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useRef } from 'react';
 import { db, checkPermission } from '@/services/db';
-import { Block, BlockStatus, StaffMember } from '../types';
+import { Block, BlockStatus, StaffMember } from '@/types';
 import ExcelJS from 'exceljs';
 
 interface Props {
@@ -384,7 +384,7 @@ export const Processing: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
                       </div>
                     )}
                     <div>
-                      <div className="text-sm font-black text-[#292524]">#{block.jobNo}</div>
+                      <div className="text-sm font-black text-[#292524]">#{block.jobNo.replace(/^AR\s*268\s*/i, '')}</div>
                       <div className="text-[9px] font-bold text-[#78716c] uppercase">{block.company}</div>
                     </div>
                   </div>
@@ -477,7 +477,7 @@ export const Processing: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-bold text-sm">#{block.jobNo}</div>
+                        <div className="font-bold text-sm">#{block.jobNo.replace(/^AR\s*268\s*/i, '')}</div>
                         <div className="text-[10px] font-medium text-[#78716c] uppercase truncate max-w-[150px]">{block.company}</div>
                       </td>
                       <td className="px-6 py-4">
@@ -533,7 +533,7 @@ export const Processing: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
                 <div>
                    <h3 className="text-2xl font-black text-[#5c4033] uppercase italic">Record Sale</h3>
                    {saleModalOpen.block && (
-                     <div className="text-[10px] font-bold text-stone-500 mt-1 uppercase">Job #{saleModalOpen.block.jobNo} &bull; Est SqFt: {saleModalOpen.block.totalSqFt?.toFixed(2)}</div>
+                     <div className="text-[10px] font-bold text-stone-500 mt-1 uppercase">Job #{saleModalOpen.block.jobNo.replace(/^AR\s*268\s*/i, '')} &bull; Est SqFt: {saleModalOpen.block.totalSqFt?.toFixed(2)}</div>
                    )}
                 </div>
                 <button onClick={() => setSaleModalOpen({open: false, block: null})} className="text-stone-400 hover:text-stone-600"><i className="fas fa-times"></i></button>
@@ -581,7 +581,7 @@ export const Processing: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h3 className="text-lg font-black text-[#292524] uppercase italic">Update Output</h3>
-                <p className="text-[#78716c] text-[10px] font-bold uppercase tracking-widest mt-1">Job #{blocks.find(b => b.id === finishModalOpen.id)?.jobNo}</p>
+                <p className="text-[#78716c] text-[10px] font-bold uppercase tracking-widest mt-1">Job #{blocks.find(b => b.id === finishModalOpen.id)?.jobNo.replace(/^AR\s*268\s*/i, '')}</p>
               </div>
               <button onClick={() => setFinishModalOpen(null)} className="text-[#a8a29e] hover:text-[#57534e] transition-colors"><i className="fas fa-times text-lg"></i></button>
             </div>

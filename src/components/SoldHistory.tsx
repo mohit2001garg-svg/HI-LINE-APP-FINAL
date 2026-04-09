@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { db } from '../services/db';
-import { Block, BlockStatus, StaffMember } from '../types';
-import { exportToExcel } from '../services/utils';
+import { db } from '@/services/db';
+import { Block, BlockStatus, StaffMember } from '@/types';
+import { exportToExcel } from '@/services/utils';
 
 interface Props {
   blocks: Block[];
@@ -250,7 +250,7 @@ export const SoldHistory: React.FC<Props> = ({ blocks, onRefresh, isGuest, activ
                 </div>
                 <div className="flex justify-between items-center">
                   <div className="text-[10px] font-bold text-[#a8a29e] uppercase truncate max-w-[180px]">
-                    {block.jobNo} ({block.company})
+                    #{block.jobNo.replace(/^AR\s*268\s*/i, '')} ({block.company.includes('ARIZONA') && !block.company.includes('(AR 268)') ? 'ARIZONA (AR 268)' : block.company})
                   </div>
                   {!isGuest && (
                     <div className="flex gap-2">

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { db, checkPermission } from '../services/db';
-import { Block, BlockStatus, PowerCut, ResinTreatmentType, StaffMember } from '../types';
+import { db, checkPermission } from '@/services/db';
+import { Block, BlockStatus, PowerCut, ResinTreatmentType, StaffMember } from '@/types';
 import ExcelJS from 'exceljs';
 
 interface Props {
@@ -282,7 +282,7 @@ const ResinLineCard: React.FC<{
                           {selectedIds.has(b.id) && <i className="fas fa-check text-white text-[7px]"></i>}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-[11px] font-black text-[#292524] leading-none">#{b.jobNo}</div>
+                          <div className="text-[11px] font-black text-[#292524] leading-none">#{b.jobNo.replace(/^AR\s*268\s*/i, '')}</div>
                           <div className="text-[9px] text-[#78716c] font-bold uppercase truncate">{b.company}</div>
                         </div>
                         <div className="text-[9px] font-bold text-[#57534e] uppercase">{b.material}</div>
@@ -353,7 +353,7 @@ const ResinLineCard: React.FC<{
                   <div className="mt-2 space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar pr-1.5">
                     {activeBlocks.map(b => (
                       <div key={b.id} className="bg-white border border-stone-200 rounded-lg p-2 shadow-sm grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-0.5">
-                        <div className="font-black text-[11px] text-[#292524] truncate">#{b.jobNo}</div>
+                        <div className="font-black text-[11px] text-[#292524] truncate">#{b.jobNo.replace(/^AR\s*268\s*/i, '')}</div>
                         <div className="text-right font-black text-[10px] text-[#5c4033]">{b.weight?.toFixed(2)} T</div>
                         <div className="text-[8px] text-[#78716c] font-black uppercase truncate">{b.company}</div>
                         <div className="text-right text-[8px] font-bold text-[#a8a29e] uppercase">{b.material}</div>

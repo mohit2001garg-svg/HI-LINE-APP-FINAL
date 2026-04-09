@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo, useRef } from 'react';
 import { db } from '@/services/db';
-import { Block, BlockStatus, StockyardLocation, StaffMember } from '../types';
-import { exportToExcel } from '../services/utils';
+import { Block, BlockStatus, StockyardLocation, StaffMember } from '@/types';
+import { exportToExcel, formatThickness } from '@/services/utils';
 import ExcelJS from 'exceljs';
 
 interface Props {
@@ -40,13 +40,6 @@ export const Stockyard: React.FC<Props> = ({ blocks, onRefresh, activeStaff, isG
 
   // Normalization logic
   const normalize = (s: string) => (s || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-
-  // Helper to format thickness with MM
-  const formatThickness = (t: string | undefined) => {
-    if (!t) return '-';
-    const val = t.toUpperCase().trim();
-    return val.includes('MM') ? val : `${val} MM`;
-  };
 
   // Base list of yard blocks (unfiltered by selection, only status)
   const baseYardBlocks = useMemo(() => blocks.filter(b => b.status === BlockStatus.IN_STOCKYARD), [blocks]);
@@ -605,53 +598,53 @@ export const Stockyard: React.FC<Props> = ({ blocks, onRefresh, activeStaff, isG
             
             return (
               <div key={block.id} className={`bg-white border border-[#d6d3d1] rounded-2xl p-4 shadow-sm transition-all ${isSelected ? 'ring-2 ring-[#5c4033] bg-[#fffaf5]' : ''}`}>
-                <div className="flex justify-between items-start mb-2">
-                   <div className="flex items-start gap-3">
+                <div className="flex justify-between items-start mb-3">
+                   <div className="flex items-start gap-3 min-w-0">
                       {!isGuest && (
-                        <input type="checkbox" checked={isSelected} onChange={() => handleToggleId(block.id)} className="w-5 h-5 mt-0.5 rounded border-stone-300 text-[#5c4033]" />
+                        <input type="checkbox" checked={isSelected} onChange={() => handleToggleId(block.id)} className="w-5 h-5 mt-1 rounded border-stone-300 text-[#5c4033] shrink-0" />
                       )}
-                      <div>
-                         <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2">
-                               <span className="text-base font-black text-[#292524]">#{block.jobNo}</span>
-                               <span className="bg-stone-100 text-[8px] font-bold px-1.5 py-0.5 rounded border border-stone-200 uppercase text-stone-500">{block.stockyardLocation}</span>
+                      <div className="min-w-0">
+                         <div className="flex flex-col gap-1.5">
+                            <div className="flex flex-wrap items-center gap-2">
+                               <span className="text-base font-black text-[#292524]">#{block.jobNo.replace(/^AR\s*268\s*/i, '')}</span>
+                               <span className="bg-stone-100 text-[9px] font-bold px-2 py-0.5 rounded border border-stone-200 uppercase text-stone-500 whitespace-nowrap">{block.stockyardLocation}</span>
                             </div>
-                            <div className="text-[10px] font-bold text-[#78716c] uppercase">
-                               {block.company} {block.minesMarka ? `(${block.minesMarka})` : ''}
+                            <div className="text-xs font-black text-[#5c4033] uppercase leading-tight break-words">
+                               {block.company.includes('ARIZONA') && !block.company.includes('(AR 268)') ? 'ARIZONA (AR 268)' : block.company} {block.minesMarka ? `(${block.minesMarka})` : ''}
                             </div>
                          </div>
                       </div>
                    </div>
-                   <div className="text-right flex flex-col items-end ml-2 shrink-0">
-                      <div className="text-base font-black text-[#292524] tabular-nums">
+                   <div className="text-right flex flex-col items-end ml-3 shrink-0">
+                      <div className="text-lg font-black text-[#292524] tabular-nums leading-none">
                         {block.totalSqFt?.toFixed(2)} <span className="text-[10px] font-bold text-[#78716c]">ft</span>
                       </div>
-                      <div className="text-[9px] font-black text-emerald-600 uppercase">{recovery} ft/T</div>
+                      <div className="text-[10px] font-black text-emerald-600 uppercase mt-1">{recovery} ft/T</div>
                    </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-3 gap-y-2 border-t border-[#f5f5f4] pt-3 mt-2">
-                   <div className="flex justify-between items-center bg-[#faf9f6] px-2.5 py-1.5 rounded-lg border border-stone-100">
-                      <div className="text-[8px] font-bold text-[#a8a29e] uppercase tracking-wider">Thick</div>
-                      <div className="text-[10px] font-black text-[#292524]">{formatThickness(block.thickness)}</div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-[#f5f5f4] pt-4 mt-2">
+                   <div className="flex justify-between items-center bg-[#faf9f6] px-3 py-2 rounded-lg border border-stone-100">
+                      <div className="text-[9px] font-bold text-[#a8a29e] uppercase tracking-wider">Thick</div>
+                      <div className="text-xs font-black text-[#292524]">{formatThickness(block.thickness)}</div>
                    </div>
-                   <div className="flex justify-between items-center bg-[#faf9f6] px-2.5 py-1.5 rounded-lg border border-stone-100">
-                      <div className="text-[8px] font-bold text-[#a8a29e] uppercase tracking-wider">Slabs</div>
-                      <div className="text-[10px] font-black text-[#292524]">{block.slabCount || '-'}</div>
+                   <div className="flex justify-between items-center bg-[#faf9f6] px-3 py-2 rounded-lg border border-stone-100">
+                      <div className="text-[9px] font-bold text-[#a8a29e] uppercase tracking-wider">Weight</div>
+                      <div className="text-xs font-black text-[#292524]">{block.weight?.toFixed(2)} T</div>
                    </div>
                    
                    <div className="flex justify-between items-center px-1">
-                      <div className="text-[8px] font-bold text-[#a8a29e] uppercase tracking-wider">Weight</div>
-                      <div className="text-[10px] font-bold text-[#44403c] uppercase">{block.weight?.toFixed(2)} T</div>
+                      <div className="text-[9px] font-bold text-[#a8a29e] uppercase tracking-wider">Slabs</div>
+                      <div className="text-xs font-black text-[#292524]">{block.slabCount || '-'}</div>
                    </div>
                    <div className="flex justify-between items-center px-1">
-                      <div className="text-[8px] font-bold text-[#a8a29e] uppercase tracking-wider">Size</div>
-                      <div className="text-[10px] font-bold text-[#44403c] uppercase">{Math.round(block.slabLength || 0)} x {Math.round(block.slabWidth || 0)}</div>
+                      <div className="text-[9px] font-bold text-[#a8a29e] uppercase tracking-wider">Material</div>
+                      <div className="text-xs font-black text-[#44403c] uppercase ml-2 truncate">{block.material}</div>
                    </div>
-                   
-                   <div className="flex justify-between items-center col-span-2 px-1 pt-1">
-                      <div className="text-[8px] font-bold text-[#a8a29e] uppercase tracking-wider">Material</div>
-                      <div className="text-[10px] font-bold text-[#44403c] uppercase ml-2">{block.material}</div>
+
+                   <div className="col-span-2 flex justify-between items-center bg-stone-50 px-3 py-2 rounded-lg border border-stone-100">
+                      <div className="text-[9px] font-bold text-[#a8a29e] uppercase tracking-wider">Size (L x W)</div>
+                      <div className="text-xs font-black text-[#44403c] uppercase">{Math.round(block.slabLength || 0)} x {Math.round(block.slabWidth || 0)}</div>
                    </div>
                 </div>
 

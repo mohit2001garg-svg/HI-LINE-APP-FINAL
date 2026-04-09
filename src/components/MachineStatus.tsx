@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { db, checkPermission } from '@/services/db';
-import { Block, BlockStatus, MachineId, PowerCut, StaffMember } from '../types';
+import { Block, BlockStatus, MachineId, PowerCut, StaffMember } from '@/types';
 import ExcelJS from 'exceljs';
 
 interface Props {
@@ -264,7 +264,7 @@ const MachineCard: React.FC<{
                             onClick={() => handleSelectBlock(b)}
                           >
                             <div className="flex justify-between items-center">
-                              <span className="text-xs font-black text-[#292524]">#{b.jobNo}</span>
+                              <span className="text-xs font-black text-[#292524]">#{b.jobNo.replace(/^AR\s*268\s*/i, '')}</span>
                               <span className="text-[9px] font-bold text-[#a8a29e] uppercase">{b.material}</span>
                             </div>
                             <div className="text-[10px] font-bold text-[#78716c] truncate mt-0.5">{b.company}</div>
@@ -328,7 +328,7 @@ const MachineCard: React.FC<{
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="px-2 py-0.5 bg-amber-50 text-amber-800 text-[10px] rounded font-bold">
-                    #{currentBlock.jobNo}
+                    #{currentBlock.jobNo.replace(/^AR\s*268\s*/i, '')}
                   </span>
                   <span className="px-2 py-0.5 bg-white text-[#78716c] text-[10px] rounded border border-[#d6d3d1] font-bold">
                     {currentBlock.thickness || 'N/A'}

@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { db, checkPermission } from '../services/db';
-import { Block, BlockStatus, PreCuttingProcess, StaffMember } from '../types';
-import { exportToExcel } from '../services/utils';
+import { db, checkPermission } from '@/services/db';
+import { Block, BlockStatus, PreCuttingProcess, StaffMember } from '@/types';
+import { exportToExcel } from '@/services/utils';
 import ExcelJS from 'exceljs';
 
 interface Props {
@@ -431,24 +431,24 @@ export const GantryQueue: React.FC<Props> = ({ blocks, onRefresh, isGuest, activ
           const isDisabled = isGuest || !canEdit;
           
           return (
-            <div key={block.id} className={`bg-white border border-[#d6d3d1] p-3 rounded-xl shadow-sm ${isSelected ? 'ring-2 ring-[#5c4033] bg-[#fffaf5]' : ''}`}>
+                  <div key={block.id} className={`bg-white border border-[#d6d3d1] p-3 rounded-xl shadow-sm ${isSelected ? 'ring-2 ring-[#5c4033] bg-[#fffaf5]' : ''}`}>
               <div className="flex justify-between items-start mb-1.5">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 min-w-0">
                   {!isGuest && canEdit && (
                     <div onClick={() => {
                         const n = new Set(selectedIds);
                         if(n.has(block.id)) n.delete(block.id); else n.add(block.id);
                         setSelectedIds(n);
-                    }} className={`w-5 h-5 rounded border flex items-center justify-center ${isSelected ? 'bg-[#5c4033] border-[#5c4033]' : 'border-stone-300'}`}>
+                    }} className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${isSelected ? 'bg-[#5c4033] border-[#5c4033]' : 'border-stone-300'}`}>
                       {isSelected && <i className="fas fa-check text-white text-[8px]"></i>}
                     </div>
                   )}
-                  <div>
-                    <div className="text-sm font-black text-[#292524]">#{block.jobNo}</div>
-                    <div className="text-[9px] font-bold text-[#78716c] uppercase">{block.company}</div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-black text-[#292524]">#{block.jobNo.replace(/^AR\s*268\s*/i, '')}</div>
+                    <div className="text-[10px] font-black text-[#5c4033] uppercase break-words">{block.company.includes('ARIZONA') && !block.company.includes('(AR 268)') ? 'ARIZONA (AR 268)' : block.company}</div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right shrink-0 ml-2">
                   <div className="text-sm font-black text-[#5c4033]">{block.weight?.toFixed(2)} T</div>
                   <div className="text-[9px] text-[#a8a29e] font-mono">{Math.round(block.length)}x{Math.round(block.height)}x{Math.round(block.width)}</div>
                 </div>
