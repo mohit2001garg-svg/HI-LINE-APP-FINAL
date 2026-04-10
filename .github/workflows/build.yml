@@ -86,6 +86,14 @@ jobs:
         run: |
           npm install @rollup/rollup-darwin-arm64 --legacy-peer-deps
           npm install @capacitor/ios@~6.0.0 --legacy-peer-deps
+          npm install @capacitor/assets --legacy-peer-deps
+
+      - name: Prepare Icon Assets for iOS
+        run: |
+          mkdir -p resources
+          cp asset/logo.png resources/icon.png
+          cp asset/logo.png resources/icon-foreground.png
+          cp asset/logo.png resources/splash.png
 
       - name: Build Web Assets
         run: npm run build
@@ -95,7 +103,7 @@ jobs:
       - name: Initialize Capacitor & Resources
         run: |
           npx cap add ios || echo "iOS platform already exists"
-          npm run resources || echo "Resources step skipped"
+          npx capacitor-assets generate --ios || echo "Assets generation skipped"
           npx cap sync ios
           npx cap copy ios
 
