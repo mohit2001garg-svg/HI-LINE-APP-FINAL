@@ -1,12 +1,9 @@
-
 name: Build Application
-
 on:
   push:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
-
 jobs:
   build-android:
     name: Build Android APK
@@ -14,40 +11,32 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-
       - name: Install dependencies
         run: npm install
-
       - name: Build Web Assets
         run: npm run build
         env:
           API_KEY: ${{ secrets.API_KEY }}
-
       - name: Initialize Capacitor & Resources
-        # We manually run parts of build:apk to ensure permissions handling
         run: |
           npx cap add android || echo "Android platform already exists"
           npx cap sync android
           npm run resources
           npx cap copy android
-
       - name: Build Debug APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
-
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -60,6 +49,30 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install @rollup/rollup-win32-x64-msvc
+      - name: Build EXE
+        run: npm run build:exe
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+      - name: Upload EXE Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: dist/*.exe
+
+  build-ios:
+    name: Build iOS IPA
+    runs-on: macos-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -67,18 +80,50 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: |
-          npm install
-          npm install @rollup/rollup-win32-x64-msvc
+        run: npm install --legacy-peer-deps
 
-      - name: Build EXE
-        # This script runs 'npm run build' followed by 'electron-builder'
-        run: npm run build:exe
+      - name: Install Capacitor iOS (version matched to your core)
+        run: npm install @capacitor/ios@~6.0.0 --legacy-peer-deps
+
+      - name: Build Web Assets
+        run: npm run build
         env:
           API_KEY: ${{ secrets.API_KEY }}
 
-      - name: Upload EXE Artifact
+      - name: Initialize Capacitor & Resources
+        run: |
+          npx cap add ios || echo "iOS platform already exists"
+          npm run resources || echo "Resources step skipped"
+          npx cap sync ios
+          npx cap copy ios
+
+      - name: Install CocoaPods Dependencies
+        run: |
+          cd ios/App
+          pod install
+
+      - name: Build iOS App (unsigned)
+        run: |
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath ios/DerivedData \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build
+
+      - name: Package IPA (unsigned)
+        run: |
+          mkdir -p ios/ipa/Payload
+          cp -r ios/DerivedData/Build/Products/Release-iphoneos/App.app ios/ipa/Payload/
+          cd ios/ipa
+          zip -r App.ipa Payload/
+
+      - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-installer
-          path: dist/*.exe
+          name: ios-ipa
+          path: ios/ipa/App.ipa
