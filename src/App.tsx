@@ -1,19 +1,19 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { db, supabase } from '@/services/db';
-import { Block, StaffMember, View, Branding, BlockStatus } from '@/types';
-import { BlockArrival } from '@/components/BlockArrival';
-import { GantryQueue } from '@/components/GantryQueue';
-import { MachineStatus } from '@/components/MachineStatus';
-import { ReadyStock } from '@/components/ReadyStock';
-import { Processing } from '@/components/Processing';
-import { Stockyard } from '@/components/Stockyard';
-import { SoldHistory } from '@/components/SoldHistory';
-import { Login } from '@/components/Login';
-import { ResinLine } from '@/components/ResinLine';
-import { Dashboard } from '@/components/Dashboard';
-import { Settings } from '@/components/Settings';
-import { Purchase } from '@/components/Purchase';
+import { db, supabase } from './services/db';
+import { Block, StaffMember, View, Branding, BlockStatus } from './types';
+import { BlockArrival } from './components/BlockArrival';
+import { GantryQueue } from './components/GantryQueue';
+import { MachineStatus } from './components/MachineStatus';
+import { ReadyStock } from './components/ReadyStock';
+import { Processing } from './components/Processing';
+import { Stockyard } from './components/Stockyard';
+import { SoldHistory } from './components/SoldHistory';
+import { Login } from './components/Login';
+import { ResinLine } from './components/ResinLine';
+import { Dashboard } from './components/Dashboard';
+import { Settings } from './components/Settings';
+import { Purchase } from './components/Purchase';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);

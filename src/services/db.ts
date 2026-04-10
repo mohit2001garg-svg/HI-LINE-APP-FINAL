@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Block, BlockStatus, StaffMember, PowerCut } from '@/types';
+import { Block, BlockStatus, StaffMember, PowerCut } from '../types';
 
 const SUPABASE_URL = 'https://tzlwwwelfdbjezwtertm.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_uOWf2wCYa7gf4JiXAh_Lqw_YlsuxNgy';

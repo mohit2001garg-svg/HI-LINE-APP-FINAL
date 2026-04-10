@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Branding } from '@/types';
-import { db } from '@/services/db';
+import { Branding } from '../types';
+import { db } from '../services/db';
 
 interface Props {
   branding: Branding;

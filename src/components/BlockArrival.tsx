@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { db } from '@/services/db';
-import { BlockStatus, Block, StaffMember } from '@/types';
+import { db } from '../services/db';
+import { BlockStatus, Block, StaffMember } from '../types';
 import ExcelJS from 'exceljs';
 
 interface Props {
@@ -294,10 +294,10 @@ export const BlockArrival: React.FC<Props> = ({ onSuccess, activeStaff, blocks }
             {recentArrivals.map(b => (
               <div key={b.id} className="px-4 py-2.5 hover:bg-[#faf9f6]">
                 <div className="flex justify-between">
-                  <span className="font-bold text-[11px] text-[#292524]">#{b.jobNo.replace(/^AR\s*268\s*/i, '')}</span>
+                  <span className="font-bold text-[11px] text-[#292524]">#{b.jobNo}</span>
                   <span className="text-[9px] text-[#a8a29e] font-medium">{b.arrivalDate}</span>
                 </div>
-                <div className="text-[9px] text-[#78716c] mt-0.5 font-bold uppercase truncate">{b.company.includes('ARIZONA') && !b.company.includes('(AR 268)') ? 'ARIZONA (AR 268)' : b.company} &bull; {b.weight}T</div>
+                <div className="text-[9px] text-[#78716c] mt-0.5 font-bold uppercase truncate">{b.company} &bull; {b.weight}T</div>
               </div>
             ))}
             {recentArrivals.length === 0 && (

@@ -1,8 +1,7 @@
 
 import React, { useState, useMemo, useRef } from 'react';
-import { db, checkPermission } from '@/services/db';
-import { Block, BlockStatus, StockyardLocation, StaffMember } from '@/types';
-import { formatThickness } from '@/services/utils';
+import { db, checkPermission } from '../services/db';
+import { Block, BlockStatus, StockyardLocation, StaffMember } from '../types';
 import ExcelJS from 'exceljs';
 
 interface Props {
@@ -25,6 +24,12 @@ export const ReadyStock: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const normalize = (s: string) => (s || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+  const formatThickness = (t: string | undefined) => {
+    if (!t) return '-';
+    const val = t.toUpperCase().trim();
+    return val.includes('MM') ? val : `${val} MM`;
+  };
 
   const readyBlocks = useMemo(() => {
     return blocks
@@ -208,18 +213,18 @@ export const ReadyStock: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
       <div className="lg:hidden space-y-3">
         {readyBlocks.map(block => (
           <div key={block.id} className="bg-white border border-[#d6d3d1] rounded-xl p-3 shadow-sm animate-in fade-in">
-            <div className="flex justify-between items-start mb-2">
-              <div className="flex flex-col gap-1 min-w-0">
-                <div className="text-sm font-black text-[#292524] leading-none">#{block.jobNo.replace(/^AR\s*268\s*/i, '')}</div>
-                <div className="text-[10px] font-black text-[#5c4033] uppercase mt-1 break-words">{block.company.includes('ARIZONA') && !block.company.includes('(AR 268)') ? 'ARIZONA (AR 268)' : block.company}</div>
+            <div className="flex justify-between items-start mb-1.5">
+              <div>
+                <div className="text-sm font-black text-[#292524] leading-none">#{block.jobNo}</div>
+                <div className="text-[9px] font-bold text-[#78716c] uppercase mt-1">{block.company}</div>
               </div>
-              <div className="text-right shrink-0 ml-2">
+              <div className="text-right">
                 <div className="text-sm font-black text-[#5c4033] leading-none">{block.totalSqFt?.toFixed(2)} ft</div>
                 <div className="text-[8px] text-[#a8a29e] font-bold mt-1 uppercase">{formatThickness(block.thickness)}</div>
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 border-t border-[#f5f5f4] pt-2 mt-2 text-[9px] font-bold uppercase tracking-wider">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1 border-t border-[#f5f5f4] pt-1.5 mt-1.5 text-[8px] font-bold uppercase tracking-wider">
               <div className="flex justify-between">
                 <span className="text-[#a8a29e]">Material</span>
                 <span className="text-[#44403c] truncate ml-1">{block.material}</span>
@@ -232,9 +237,9 @@ export const ReadyStock: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
                 <span className="text-[#a8a29e]">Slabs</span>
                 <span className="text-[#44403c]">{block.slabCount || '-'}</span>
               </div>
-              <div className="col-span-2 flex justify-between bg-stone-50 p-1.5 rounded border border-stone-100 mt-1">
-                <span className="text-[#a8a29e]">Size (L x W)</span>
-                <span className="font-mono text-[#44403c]">{Math.round(block.slabLength || 0)} x {Math.round(block.slabWidth || 0)}</span>
+              <div className="flex justify-between">
+                <span className="text-[#a8a29e]">Size</span>
+                <span className="font-mono text-[#44403c]">{Math.round(block.slabLength || 0)}x{Math.round(block.slabWidth || 0)}</span>
               </div>
             </div>
 

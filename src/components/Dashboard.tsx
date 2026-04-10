@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { Block, BlockStatus } from '@/types';
+import { Block, BlockStatus } from '../types';
 
 interface Props {
   blocks: Block[];

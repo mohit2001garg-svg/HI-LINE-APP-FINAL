@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { StaffMember, Branding } from '@/types';
-import { db } from '@/services/db';
+import { StaffMember, Branding } from '../types';
+import { db } from '../services/db';
 
 interface LoginProps {
   onLogin: (staff: StaffMember) => void;

@@ -114,9 +114,3 @@ export const exportToExcel = async (
   document.body.removeChild(anchor);
   window.URL.revokeObjectURL(url);
 };
-
-export const formatThickness = (t: string | undefined) => {
-  if (!t) return '-';
-  const val = t.toUpperCase().trim();
-  return val.includes('MM') ? val : `${val} MM`;
-};

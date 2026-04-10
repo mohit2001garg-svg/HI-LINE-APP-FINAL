@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo, useRef } from 'react';
-import { db } from '@/services/db';
-import { Block, BlockStatus, StaffMember } from '@/types';
-import { exportToExcel } from '@/services/utils';
+import { db } from '../services/db';
+import { Block, BlockStatus, StaffMember } from '../types';
+import { exportToExcel } from '../services/utils';
 import ExcelJS from 'exceljs';
 
 interface Props {
@@ -375,7 +375,7 @@ export const Purchase: React.FC<Props> = ({ blocks, onRefresh, activeStaff, isGu
       `}</style>
 
       {/* --- TOP ACTION BAR --- */}
-      <div className="bg-white border border-[#d6d3d1] p-4 lg:p-6 rounded-xl shadow-sm flex flex-col md:flex-row gap-4 items-end mb-4">
+      <div className="bg-white border border-[#d6d3d1] p-4 lg:p-6 rounded-xl shadow-sm flex flex-col md:flex-row gap-4 items-end">
         <div className="w-full md:w-48">
           <label className={labelStyle}>Party / Supplier</label>
           <select 
@@ -567,7 +567,7 @@ export const Purchase: React.FC<Props> = ({ blocks, onRefresh, activeStaff, isGu
                                 />
                               )}
                             </td>
-                            <td className="px-6 py-4 font-black text-sm text-[#292524]">#{b.jobNo.replace(/^AR\s*268\s*/i, '')}</td>
+                            <td className="px-6 py-4 font-black text-sm text-[#292524]">#{b.jobNo}</td>
                             <td className="px-6 py-4 text-xs font-bold text-[#57534e] uppercase">{b.supplier}</td>
                             <td className="px-6 py-4">
                               <div className="text-xs font-bold text-[#44403c]">{b.material}</div>
