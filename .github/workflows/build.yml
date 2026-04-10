@@ -82,8 +82,10 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Install Capacitor iOS (version matched to your core)
-        run: npm install @capacitor/ios@~6.0.0 --legacy-peer-deps
+      - name: Install macOS Rollup & Capacitor iOS
+        run: |
+          npm install @rollup/rollup-darwin-arm64 --legacy-peer-deps
+          npm install @capacitor/ios@~6.0.0 --legacy-peer-deps
 
       - name: Build Web Assets
         run: npm run build
