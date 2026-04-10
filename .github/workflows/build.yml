@@ -67,7 +67,9 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm install @rollup/rollup-win32-x64-msvc
 
       - name: Build EXE
         # This script runs 'npm run build' followed by 'electron-builder'
