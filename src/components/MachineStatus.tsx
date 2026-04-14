@@ -35,6 +35,11 @@ const MachineCard: React.FC<{
   const [manualStartTime, setManualStartTime] = useState('');
   const [manualEndTime, setManualEndTime] = useState('');
 
+  const [slabCount, setSlabCount] = useState('');
+  const [totalSqFt, setTotalSqFt] = useState('');
+  const [slabLength, setSlabLength] = useState('');
+  const [slabWidth, setSlabWidth] = useState('');
+
   const canEditCurrent = currentBlock ? checkPermission(activeStaff, currentBlock.company) : false;
 
   useEffect(() => {
@@ -204,10 +209,18 @@ const MachineCard: React.FC<{
         endTime: endTimestamp.toISOString(),
         totalCuttingTimeMinutes: netDurationMinutes,
         processingStage: 'Field', 
-        processingStartedAt: endTimestamp.toISOString()
+        processingStartedAt: endTimestamp.toISOString(),
+        slabCount: slabCount ? parseInt(slabCount) : undefined,
+        totalSqFt: totalSqFt ? parseFloat(totalSqFt) : undefined,
+        slabLength: slabLength ? parseFloat(slabLength) : undefined,
+        slabWidth: slabWidth ? parseFloat(slabWidth) : undefined
       });
       setShowFinishForm(false);
       setManualEndTime('');
+      setSlabCount('');
+      setTotalSqFt('');
+      setSlabLength('');
+      setSlabWidth('');
       onRefresh();
     } catch (err) {
       alert("Failed to finish block.");
@@ -419,6 +432,60 @@ const MachineCard: React.FC<{
                               onChange={e => setManualEndTime(e.target.value)} 
                             />
                         </div>
+
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                          <div>
+                            <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">No. of Slabs</label>
+                            <input 
+                              type="number" 
+                              required
+                              placeholder="e.g. 40"
+                              className="w-full border border-[#d6d3d1] rounded-lg p-3 text-sm focus:border-[#5c4033] outline-none" 
+                              value={slabCount} 
+                              onChange={e => setSlabCount(e.target.value)} 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Total Sq. Ft.</label>
+                            <input 
+                              type="number" 
+                              step="0.01"
+                              required
+                              placeholder="e.g. 1250.50"
+                              className="w-full border border-[#d6d3d1] rounded-lg p-3 text-sm focus:border-[#5c4033] outline-none" 
+                              value={totalSqFt} 
+                              onChange={e => setTotalSqFt(e.target.value)} 
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                          <div>
+                            <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Slab Length (Inch)</label>
+                            <input 
+                              type="number" 
+                              step="0.1"
+                              required
+                              placeholder="Length"
+                              className="w-full border border-[#d6d3d1] rounded-lg p-3 text-sm focus:border-[#5c4033] outline-none" 
+                              value={slabLength} 
+                              onChange={e => setSlabLength(e.target.value)} 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Slab Width (Inch)</label>
+                            <input 
+                              type="number" 
+                              step="0.1"
+                              required
+                              placeholder="Width"
+                              className="w-full border border-[#d6d3d1] rounded-lg p-3 text-sm focus:border-[#5c4033] outline-none" 
+                              value={slabWidth} 
+                              onChange={e => setSlabWidth(e.target.value)} 
+                            />
+                          </div>
+                        </div>
+
                         <button type="submit" disabled={isSubmitting} className="w-full bg-[#5c4033] text-white font-bold py-4 rounded-lg text-xs transition-all active:scale-[0.98]">
                           {isSubmitting ? <i className="fas fa-circle-notch fa-spin"></i> : 'Confirm & Move to Processing'}
                         </button>
