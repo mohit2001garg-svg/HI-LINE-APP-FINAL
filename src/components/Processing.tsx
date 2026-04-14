@@ -28,6 +28,20 @@ export const Processing: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
   const [finishData, setFinishData] = useState({ slabLength: '', slabWidth: '', slabCount: '', totalSqFt: '' });
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
+  // Edit Modal State
+  const [editModalOpen, setEditModalOpen] = useState<{ open: boolean; block: Block | null }>({ open: false, block: null });
+  const [editFormData, setEditFormData] = useState({ 
+    jobNo: '', 
+    company: '', 
+    material: '', 
+    minesMarka: '', 
+    weight: '',
+    slabLength: '',
+    slabWidth: '',
+    slabCount: '',
+    totalSqFt: ''
+  });
+
   // Sales Modal State
   const [saleModalOpen, setSaleModalOpen] = useState<{ open: boolean; block: Block | null }>({ open: false, block: null });
   const [saleFormData, setSaleFormData] = useState({ soldTo: '', billNo: '', soldSqFt: '' });
@@ -146,6 +160,48 @@ export const Processing: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
       totalSqFt: block.totalSqFt?.toString() || ''
     });
     setFinishModalOpen({ id: block.id, action });
+  };
+
+  const openEditModal = (block: Block) => {
+    if (!checkPermission(activeStaff, block.company)) return;
+    setEditFormData({
+      jobNo: block.jobNo || '',
+      company: block.company || '',
+      material: block.material || '',
+      minesMarka: block.minesMarka || '',
+      weight: block.weight?.toString() || '',
+      slabLength: block.slabLength?.toString() || '',
+      slabWidth: block.slabWidth?.toString() || '',
+      slabCount: block.slabCount?.toString() || '',
+      totalSqFt: block.totalSqFt?.toString() || ''
+    });
+    setEditModalOpen({ open: true, block });
+  };
+
+  const handleUpdateBlock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isGuest || !editModalOpen.block) return;
+    setIsSavingEdit(true);
+    try {
+      await db.updateBlock(editModalOpen.block.id, {
+        jobNo: editFormData.jobNo,
+        company: editFormData.company,
+        material: editFormData.material,
+        minesMarka: editFormData.minesMarka,
+        weight: Number(editFormData.weight) || 0,
+        slabLength: Number(editFormData.slabLength) || 0,
+        slabWidth: Number(editFormData.slabWidth) || 0,
+        slabCount: Number(editFormData.slabCount) || 0,
+        totalSqFt: Number(editFormData.totalSqFt) || 0
+      });
+      setEditModalOpen({ open: false, block: null });
+      onRefresh();
+      alert("Block updated successfully.");
+    } catch (err: any) {
+      alert("Update failed: " + err.message);
+    } finally {
+      setIsSavingEdit(false);
+    }
   };
 
   const openSaleModal = (block: Block) => {
@@ -414,6 +470,7 @@ export const Processing: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
                 <div className="flex flex-wrap justify-end gap-1 mt-2 pt-1.5 border-t border-[#f5f5f4]">
                   {!isGuest && canEdit ? (
                     <>
+                      <button onClick={() => openEditModal(block)} className="px-1.5 py-1 bg-stone-50 border border-stone-200 rounded-lg text-[8px] font-bold text-stone-600 uppercase tracking-wider" title="Edit Block"><i className="fas fa-edit"></i></button>
                       <button onClick={() => openSaleModal(block)} className="px-1.5 py-1 bg-amber-50 border border-amber-200 rounded-lg text-[8px] font-bold text-amber-600 uppercase tracking-wider"><i className="fas fa-shopping-cart"></i></button>
                       <button onClick={() => openFinishModal(block, 'resin')} className="flex-1 px-1.5 py-1 bg-stone-50 border border-stone-200 rounded-lg text-[8px] font-bold text-cyan-600 uppercase tracking-wider">Resin</button>
                       <button onClick={() => openFinishModal(block, 'stockyard')} className="flex-1 px-1.5 py-1 bg-stone-50 border border-stone-200 rounded-lg text-[8px] font-bold text-emerald-600 uppercase tracking-wider">Yard</button>
@@ -503,6 +560,7 @@ export const Processing: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
                         <div className="flex justify-end gap-1">
                           {!isGuest && canEdit ? (
                             <>
+                              <button onClick={() => openEditModal(block)} className="w-8 h-8 flex items-center justify-center bg-white border border-stone-200 text-stone-600 rounded-lg hover:bg-stone-50 transition-all shadow-sm" title="Edit Block"><i className="fas fa-edit text-xs"></i></button>
                               <button onClick={() => openSaleModal(block)} className="w-8 h-8 flex items-center justify-center bg-white border border-amber-200 text-amber-600 rounded-lg hover:bg-amber-50 transition-all shadow-sm" title="Record Sale"><i className="fas fa-shopping-cart text-xs"></i></button>
                               <button onClick={() => openFinishModal(block, 'resin')} className="w-8 h-8 flex items-center justify-center bg-white border border-cyan-200 text-cyan-600 rounded-lg hover:bg-cyan-50 transition-all shadow-sm" title="Move to Resin"><i className="fas fa-flask text-xs"></i></button>
                               <button onClick={() => openFinishModal(block, 'stockyard')} className="w-8 h-8 flex items-center justify-center bg-white border border-emerald-200 text-emerald-600 rounded-lg hover:bg-emerald-50 transition-all shadow-sm" title="Move to Stockyard"><i className="fas fa-warehouse text-xs"></i></button>
@@ -567,6 +625,80 @@ export const Processing: React.FC<Props> = ({ blocks, onRefresh, isGuest, active
                     <button type="button" onClick={() => setSaleModalOpen({open: false, block: null})} className="flex-1 bg-stone-100 py-4 rounded-xl font-bold uppercase text-xs text-stone-600">Cancel</button>
                     <button type="submit" disabled={isSavingEdit} className="flex-[2] bg-[#5c4033] text-white py-4 rounded-xl font-bold uppercase text-xs shadow-xl active:scale-95 transition-all">
                       {isSavingEdit ? 'Recording...' : 'Complete Sale'}
+                    </button>
+                 </div>
+              </form>
+           </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editModalOpen.open && (
+        <div className="fixed inset-0 z-[600] bg-stone-900/80 backdrop-blur-md flex items-center justify-center p-4">
+           <div className="bg-white rounded-2xl w-full max-w-lg p-8 shadow-2xl animate-in zoom-in-95">
+              <div className="flex justify-between items-start mb-6 border-b pb-4">
+                <div>
+                   <h3 className="text-2xl font-black text-[#5c4033] uppercase italic">Edit Block</h3>
+                   {editModalOpen.block && (
+                     <div className="text-[10px] font-bold text-stone-500 mt-1 uppercase">Job #{editModalOpen.block.jobNo}</div>
+                   )}
+                </div>
+                <button onClick={() => setEditModalOpen({open: false, block: null})} className="text-stone-400 hover:text-stone-600"><i className="fas fa-times"></i></button>
+              </div>
+
+              <form onSubmit={handleUpdateBlock} className="space-y-4">
+                 <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Job No</label>
+                        <input required className="w-full bg-white border border-[#d6d3d1] p-3 rounded-xl text-sm font-bold text-[#5c4033] focus:border-[#5c4033] outline-none" value={editFormData.jobNo} onChange={e => setEditFormData({...editFormData, jobNo: e.target.value})} />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Company</label>
+                        <input required className="w-full bg-white border border-[#d6d3d1] p-3 rounded-xl text-sm font-bold text-[#5c4033] focus:border-[#5c4033] outline-none" value={editFormData.company} onChange={e => setEditFormData({...editFormData, company: e.target.value})} />
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Material</label>
+                        <input required className="w-full bg-white border border-[#d6d3d1] p-3 rounded-xl text-sm font-bold text-[#5c4033] focus:border-[#5c4033] outline-none" value={editFormData.material} onChange={e => setEditFormData({...editFormData, material: e.target.value})} />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Marka</label>
+                        <input className="w-full bg-white border border-[#d6d3d1] p-3 rounded-xl text-sm font-bold text-[#5c4033] focus:border-[#5c4033] outline-none" value={editFormData.minesMarka} onChange={e => setEditFormData({...editFormData, minesMarka: e.target.value})} />
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Weight (T)</label>
+                        <input type="number" step="0.01" required className="w-full bg-white border border-[#d6d3d1] p-3 rounded-xl text-sm font-bold text-[#5c4033] focus:border-[#5c4033] outline-none" value={editFormData.weight} onChange={e => setEditFormData({...editFormData, weight: e.target.value})} />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Total Sq Ft</label>
+                        <input type="number" step="0.01" required className="w-full bg-white border border-[#d6d3d1] p-3 rounded-xl text-sm font-bold text-[#5c4033] focus:border-[#5c4033] outline-none" value={editFormData.totalSqFt} onChange={e => setEditFormData({...editFormData, totalSqFt: e.target.value})} />
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-3 gap-4">
+                    <div>
+                        <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Length (In)</label>
+                        <input type="number" step="0.1" required className="w-full bg-white border border-[#d6d3d1] p-3 rounded-xl text-sm font-bold text-[#5c4033] focus:border-[#5c4033] outline-none" value={editFormData.slabLength} onChange={e => setEditFormData({...editFormData, slabLength: e.target.value})} />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Width (In)</label>
+                        <input type="number" step="0.1" required className="w-full bg-white border border-[#d6d3d1] p-3 rounded-xl text-sm font-bold text-[#5c4033] focus:border-[#5c4033] outline-none" value={editFormData.slabWidth} onChange={e => setEditFormData({...editFormData, slabWidth: e.target.value})} />
+                    </div>
+                    <div>
+                        <label className="block text-[10px] font-bold text-[#78716c] mb-1.5 uppercase">Slabs</label>
+                        <input type="number" required className="w-full bg-white border border-[#d6d3d1] p-3 rounded-xl text-sm font-bold text-[#5c4033] focus:border-[#5c4033] outline-none" value={editFormData.slabCount} onChange={e => setEditFormData({...editFormData, slabCount: e.target.value})} />
+                    </div>
+                 </div>
+                 
+                 <div className="flex gap-4 pt-4">
+                    <button type="button" onClick={() => setEditModalOpen({open: false, block: null})} className="flex-1 bg-stone-100 py-4 rounded-xl font-bold uppercase text-xs text-stone-600">Cancel</button>
+                    <button type="submit" disabled={isSavingEdit} className="flex-[2] bg-[#5c4033] text-white py-4 rounded-xl font-bold uppercase text-xs shadow-xl active:scale-95 transition-all">
+                      {isSavingEdit ? 'Saving...' : 'Save Changes'}
                     </button>
                  </div>
               </form>
