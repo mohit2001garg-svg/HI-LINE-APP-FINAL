@@ -48,6 +48,26 @@ export const Dashboard: React.FC<Props> = ({ blocks, onViewChange }) => {
     );
   }, [blocks, searchTerm]);
 
+  const handleSearchResultClick = (b: Block) => {
+    switch (b.status) {
+      case BlockStatus.PURCHASED: onViewChange('purchase'); break;
+      case BlockStatus.GANTRY: onViewChange('gantry-stock'); break;
+      case BlockStatus.CUTTING: onViewChange('machine-status'); break;
+      case BlockStatus.PROCESSING: 
+        if (b.isSentToResin) {
+          onViewChange('resin-line');
+        } else {
+          onViewChange('processing');
+        }
+        break;
+      case BlockStatus.RESINING: onViewChange('resin-line'); break;
+      case BlockStatus.COMPLETED: onViewChange('ready-stock'); break;
+      case BlockStatus.IN_STOCKYARD: onViewChange('stockyard'); break;
+      case BlockStatus.SOLD: onViewChange('sold-history'); break;
+      default: onViewChange('dashboard');
+    }
+  };
+
   const StatCard = ({ icon, label, value, subValue, highlight, onClick }: any) => (
     <button 
       onClick={onClick}
@@ -111,7 +131,11 @@ export const Dashboard: React.FC<Props> = ({ blocks, onViewChange }) => {
 
             <div className="grid gap-3">
                {searchResults.map(b => (
-                  <div key={b.id} className="bg-white border border-[#d6d3d1] p-4 rounded-xl shadow-sm hover:shadow-md transition-all">
+                  <button 
+                     key={b.id} 
+                     onClick={() => handleSearchResultClick(b)}
+                     className="w-full text-left bg-white border border-[#d6d3d1] p-4 rounded-xl shadow-sm hover:shadow-md hover:border-[#a8a29e] transition-all"
+                  >
                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         {/* Identity */}
                         <div className="flex items-start gap-3">
@@ -172,7 +196,7 @@ export const Dashboard: React.FC<Props> = ({ blocks, onViewChange }) => {
                            </div>
                         </div>
                      </div>
-                  </div>
+                  </button>
                ))}
                {searchResults.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-20 bg-white border border-dashed border-[#d6d3d1] rounded-xl text-center">
